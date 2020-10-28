@@ -1,0 +1,42 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Home Notifications API
+
+servers:
+  - url: https://test/api/
+    description: Test server
+  - url: https://prod/api
+    description: Production server
+
+tags:
+  - name: "Test tag"
+    description: "TEst tag"
+
+paths:
+  /test/api:
+    get:
+      tags:
+        - "Test tag"
+      description: "Test desc"
+      parameters:
+        - name: "id"
+          in: "query"
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StringResponse"
+
+components:
+  schemas:
+    StringResponse:
+      type: "object"
+      properties:
+        result:
+          type: "string"
