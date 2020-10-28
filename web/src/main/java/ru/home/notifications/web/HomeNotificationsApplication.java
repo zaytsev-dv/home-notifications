@@ -1,4 +1,4 @@
-package ru.home.notifications;
+package ru.home.notifications.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
