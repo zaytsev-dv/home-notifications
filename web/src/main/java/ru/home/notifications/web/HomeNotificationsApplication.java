@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"ru.home.notifications.*"})
-@EntityScan(basePackages = {"ru.home.notifications.*"})
 public class HomeNotificationsApplication
 {
 
