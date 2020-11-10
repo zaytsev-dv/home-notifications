@@ -6,7 +6,8 @@ import ru.home.notifications.core.exceptions.AdapterNotFoundException;
 public enum Adapter
 {
 	EMAIL(1, "Email"),
-	SMS(2, "SMS");
+	SMS(2, "SMS"),
+	TELEGRAM(3, "Telegram");
 
 	private final int id;
 	private final String name;

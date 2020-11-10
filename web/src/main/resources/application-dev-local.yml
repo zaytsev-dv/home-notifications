@@ -4,14 +4,18 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: username
-    password: password
+    username: user
+    password: pass
     properties:
       mail:
         smtp:
           auth: true
           starttls:
-            enabled: true
+            enable: true
+
+bot:
+  token: token
+  username: name
 
 server:
   port: 8080

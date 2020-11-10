@@ -1,4 +1,4 @@
-package ru.home.notifications.core.adapters.email;
+package ru.home.notifications.core.adapters;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -28,7 +28,7 @@ public class EmailAdapter extends AbstractAdapter implements NotificationAdapter
 		{
 			MimeMessage mimeMessage = emailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
-			helper.setText(message, true);
+			helper.setText(message, false);
 			helper.setTo(recipient);
 			helper.setSubject(subject);
 			helper.setFrom("Home_System");
