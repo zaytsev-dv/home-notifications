@@ -23,7 +23,7 @@ services:
       - skynet
     environment:
       spring.profiles.active: 'dev-local'
-      spring.mail.username: 'zaytsev.dmitry9228@gmail.com'
+      spring.mail.username: 'user'
       spring.mail.password: 'pass'
       bot.token: 'token'
       bot.username: 'my_home_system_bot'
