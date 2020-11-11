@@ -19,6 +19,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
             <groupId>ru.home.notifications</groupId>
             <artifactId>api-module</artifactId>
             <version>${project.version}</version>
