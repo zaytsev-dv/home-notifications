@@ -10,8 +10,8 @@ services:
       POSTGRES_DB: notifications
     ports:
       - "6000:5432"
-    volumes:
-      - ./database/create_database_for_docker.sql:/docker-entrypoint-initdb.d/1.sql
+#    volumes:
+#      - ./database/create_database_for_docker.sql:/docker-entrypoint-initdb.d/1.sql
 
   notifications:
     restart: always

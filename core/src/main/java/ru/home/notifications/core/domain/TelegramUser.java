@@ -19,6 +19,15 @@ public class TelegramUser
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "nickname", columnDefinition = "text")
-	private String nickname;
+	@Column(name = "external_id", columnDefinition = "bigint")
+	private Long externalId;
+
+	@Column(name = "firstname", columnDefinition = "text")
+	private String firstname;
+
+	@Column(name = "lastname", columnDefinition = "text")
+	private String lastname;
+
+	@Column(name = "username", columnDefinition = "text")
+	private String username;
 }
