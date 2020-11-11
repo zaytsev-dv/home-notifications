@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.home.notifications.core.adapters.base.Adapter;
@@ -17,8 +16,8 @@ import ru.home.notifications.core.adapters.base.NotificationAdapter;
 import ru.home.notifications.core.domain.TelegramUser;
 import ru.home.notifications.core.service.TelegramUserService;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -79,15 +78,22 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 	@Override
 	public void onUpdateReceived(Update update)
 	{
-		if (update.getMessage() != null) {
+		if (update.getMessage() != null)
+		{
 			syncTelegramUser(update);
 		}
 
 		SendMessage response = new SendMessage();
+		Message message = null;
+		Long chatId = 0L;
+		String text = "";
 		if (update.hasMessage())
 		{
 			String username = String.format("%s", update.getMessage().getFrom().getUserName());
-			String text = "";
+
+			message = update.getMessage();
+			chatId = message.getChatId();
+
 			switch (update.getMessage().getText())
 			{
 				case "/start":
@@ -98,7 +104,7 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 					break;
 				case "/button":
 					text = "Это пример inline клавиатуры";
-					InlineKeyboardMarkup inlineKeyboardMarkup =new InlineKeyboardMarkup();
+					InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 					InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
 					inlineKeyboardButton.setText("Тык");
 					inlineKeyboardButton.setCallbackData("Button \"Тык\" has been pressed");
@@ -108,33 +114,30 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 				default:
 					text = update.getMessage().getText();
 			}
-
-			Message message = update.getMessage();
-			Long chatId = message.getChatId();
-			response.setChatId(String.valueOf(chatId));
-			response.setText(text);
-
-			sendMsgToChat(response, text, chatId);
-		} else if (update.getCallbackQuery() != null){
-			Message message = update.getCallbackQuery().getMessage();
-			Long chatId = message.getChatId();
-			response.setChatId(String.valueOf(chatId));
-			response.setText(update.getCallbackQuery().getData());
-
-			sendMsgToChat(response, update.getCallbackQuery().getData(), chatId);
 		}
+		else if (update.getCallbackQuery() != null)
+		{
+			message = update.getCallbackQuery().getMessage();
+			chatId = message.getChatId();
+			text = update.getCallbackQuery().getData();
+		}
+
+		response.setChatId(String.valueOf(chatId));
+		response.setText(text);
+
+		sendMsgToChat(response);
 	}
 
-	private void sendMsgToChat(SendMessage response, String text, Long chatId)
+	private void sendMsgToChat(SendMessage response)
 	{
 		try
 		{
 			executeAsync(response);
-			log.info("Sent message \"{}\" to {}", text, chatId);
+			log.info("Sent message \"{}\" to {}", response.getText(), response.getChatId());
 		}
 		catch (TelegramApiException e)
 		{
-			log.error("Failed to send message \"{}\" to {} due to error: {}", text, chatId, e.getMessage());
+			log.error("Failed to send message \"{}\" to {} due to error: {}", response.getText(), response.getChatId(), e.getMessage());
 		}
 	}
 
