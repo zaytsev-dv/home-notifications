@@ -8,13 +8,17 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.home.notifications.core.adapters.base.Adapter;
 import ru.home.notifications.core.adapters.base.NotificationAdapter;
 import ru.home.notifications.core.domain.TelegramUser;
 import ru.home.notifications.core.service.TelegramUserService;
 
-import java.util.Optional;
+import java.lang.reflect.Array;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -75,8 +79,11 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 	@Override
 	public void onUpdateReceived(Update update)
 	{
-		syncTelegramUser(update);
+		if (update.getMessage() != null) {
+			syncTelegramUser(update);
+		}
 
+		SendMessage response = new SendMessage();
 		if (update.hasMessage())
 		{
 			String username = String.format("%s", update.getMessage().getFrom().getUserName());
@@ -89,25 +96,45 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 				case "/help":
 					text = "Не доступно. Пни разработчика и он запилит";
 					break;
+				case "/button":
+					text = "Это пример inline клавиатуры";
+					InlineKeyboardMarkup inlineKeyboardMarkup =new InlineKeyboardMarkup();
+					InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+					inlineKeyboardButton.setText("Тык");
+					inlineKeyboardButton.setCallbackData("Button \"Тык\" has been pressed");
+					inlineKeyboardMarkup.setKeyboard(Arrays.asList(Arrays.asList(inlineKeyboardButton)));
+					response.setReplyMarkup(inlineKeyboardMarkup);
+					break;
 				default:
 					text = update.getMessage().getText();
 			}
 
 			Message message = update.getMessage();
-			SendMessage response = new SendMessage();
 			Long chatId = message.getChatId();
 			response.setChatId(String.valueOf(chatId));
 			response.setText(text);
 
-			try
-			{
-				executeAsync(response);
-				log.info("Sent message \"{}\" to {}", text, chatId);
-			}
-			catch (TelegramApiException e)
-			{
-				log.error("Failed to send message \"{}\" to {} due to error: {}", text, chatId, e.getMessage());
-			}
+			sendMsgToChat(response, text, chatId);
+		} else if (update.getCallbackQuery() != null){
+			Message message = update.getCallbackQuery().getMessage();
+			Long chatId = message.getChatId();
+			response.setChatId(String.valueOf(chatId));
+			response.setText(update.getCallbackQuery().getData());
+
+			sendMsgToChat(response, update.getCallbackQuery().getData(), chatId);
+		}
+	}
+
+	private void sendMsgToChat(SendMessage response, String text, Long chatId)
+	{
+		try
+		{
+			executeAsync(response);
+			log.info("Sent message \"{}\" to {}", text, chatId);
+		}
+		catch (TelegramApiException e)
+		{
+			log.error("Failed to send message \"{}\" to {} due to error: {}", text, chatId, e.getMessage());
 		}
 	}
 
