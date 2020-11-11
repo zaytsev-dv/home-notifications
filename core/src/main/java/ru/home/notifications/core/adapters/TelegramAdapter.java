@@ -85,7 +85,7 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 
 			try
 			{
-				execute(response);
+				executeAsync(response);
 				log.info("Sent message \"{}\" to {}", text, chatId);
 			}
 			catch (TelegramApiException e)
