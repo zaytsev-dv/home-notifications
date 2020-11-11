@@ -1,7 +1,10 @@
 CREATE TABLE telegram_users
 (
-    id       serial not null primary key,
-    nickname text   NOT NULL
+    id          bigserial not null primary key,
+    external_id bigint    not null,
+    firstname   text,
+    lastname    text,
+    username    text
 );
 
-CREATE SEQUENCE public.hibernate_sequence START 1;
+comment on column telegram_users.external_id is 'telegram user id (chatId)'

@@ -5,4 +5,5 @@ import ru.home.notifications.core.service.base.BaseService;
 
 public interface TelegramUserService extends BaseService<TelegramUser, Long>
 {
+	void checkWithSaveByExternalId(TelegramUser telegramUser);
 }

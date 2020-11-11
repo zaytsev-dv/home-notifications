@@ -7,9 +7,14 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.home.notifications.core.adapters.base.Adapter;
 import ru.home.notifications.core.adapters.base.NotificationAdapter;
+import ru.home.notifications.core.domain.TelegramUser;
+import ru.home.notifications.core.service.TelegramUserService;
+
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -20,6 +25,13 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 
 	@Value("${bot.username}")
 	private String username;
+
+	private final TelegramUserService telegramUserService;
+
+	public TelegramAdapter(TelegramUserService telegramUserService)
+	{
+		this.telegramUserService = telegramUserService;
+	}
 
 	@Override
 	public void sendNotification(String subject, String message, String recipient)
@@ -59,16 +71,20 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 		return token;
 	}
 
+	//TODO: run async
 	@Override
 	public void onUpdateReceived(Update update)
 	{
+		syncTelegramUser(update);
+
 		if (update.hasMessage())
 		{
 			String username = String.format("%s", update.getMessage().getFrom().getUserName());
 			String text = "";
-			switch (update.getMessage().getText()) {
+			switch (update.getMessage().getText())
+			{
 				case "/start":
-					text = "Привет " + "\"" + username + "\" " + "\uD83D\uDE01" +"\n"+ "Для просмотра всех доступных команд используй: \"/help\"";
+					text = "Привет " + "\"" + username + "\" " + "\uD83D\uDE01" + "\n" + "Для просмотра всех доступных команд используй: \"/help\"";
 					break;
 				case "/help":
 					text = "Не доступно. Пни разработчика и он запилит";
@@ -93,5 +109,19 @@ public class TelegramAdapter extends TelegramLongPollingBot implements Notificat
 				log.error("Failed to send message \"{}\" to {} due to error: {}", text, chatId, e.getMessage());
 			}
 		}
+	}
+
+	private void syncTelegramUser(Update update)
+	{
+		log.info("sync telegram user");
+		User from = update.getMessage().getFrom();
+		telegramUserService.checkWithSaveByExternalId(
+				TelegramUser.builder()
+						.externalId(Long.valueOf(from.getId()))
+						.firstname(from.getFirstName())
+						.lastname(from.getLastName())
+						.username(Optional.ofNullable(from.getUserName()).orElse(null))
+						.build()
+		);
 	}
 }
