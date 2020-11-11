@@ -1,6 +1,11 @@
 spring:
   application:
     name: home_notifications
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6000/notifications
+    username: postgres
+    password: postgres
   mail:
     host: smtp.gmail.com
     port: 587
